@@ -31,7 +31,7 @@ class StaffViewSet(viewsets.ModelViewSet):
         if device_user_id:
             staff.device_user_id = device_user_id
         if fingerprint_template:
-            staff.fingerprint_enrolled = fingerprint_template
+            staff.fingerprint_template = fingerprint_template
 
         staff.save()
         return Response(

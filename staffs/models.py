@@ -12,7 +12,7 @@ class Department(models.Model):
 class Staff(models.Model):
     class Gender(models.TextChoices):
         MALE = "M", "Male"
-        FEMALE = "F", "FEMALE"
+        FEMALE = "F", "Female"
 
     class Status(models.TextChoices):
         ACTIVE = "active", "Active"
@@ -25,7 +25,7 @@ class Staff(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     phone_number = models.CharField(
-        max_length=15, validators=[RegexValidator(r'^\+?\d{9, 15}$')], blank=True
+        max_length=15, validators=[RegexValidator(r'^\+?\d{9,15}$')], blank=True
     )
     gender = models.CharField(max_length=1, choices=Gender.choices, blank=True)
 

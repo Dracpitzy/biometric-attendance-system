@@ -27,10 +27,10 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
         except Staff.DoesNotExist:
             return Response(
                 {"error": "No active staff found for this fingerprint"},
-                status=staus.HTTP_404_NOT_FOUND
+                status=status.HTTP_404_NOT_FOUND
             )
 
-        today = timezone.localdata()
+        today = timezone.localdate()
         todays_logs = AttendanceLog.objects.filter(staff=staff, timestamp__date=today)
 
         already_checked_in = todays_logs.filter(log_type=AttendanceLog.LogType.CHECK_IN).exists()
@@ -42,7 +42,7 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
             log_type = AttendanceLog.LogType.CHECK_OUT
         else:
             return Response(
-                {"error": f"{staff.first_name} has alrady checked in and out today."},
+                {"error": f"{staff.first_name} has already checked in and out today."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -52,8 +52,8 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = AttendanceLogSerializer(log)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=["get"], url_path="currrently-in")
-    def currrently_in(self, request):
+    @action(detail=False, methods=["get"], url_path="currently-in")
+    def currently_in(self, request):
         today = timezone.localdate()
 
         checked_in_ids = (

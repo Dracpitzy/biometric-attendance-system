@@ -20,7 +20,7 @@ def generate_weekly_attendance_report():
         lines.append("No attendance record for this period.")
     else:
         for log in logs:
-            line.append(
+            lines.append(
                 f"{log.staff.staff_id} - {log.staff.first_name} {log.staff.last_name} | "
                 f"{log.get_log_type_display()} | {timezone.localtime(log.timestamp).strftime('%Y-%m-%d %H:%M')}"
             )
@@ -28,7 +28,7 @@ def generate_weekly_attendance_report():
     return "\n".join(lines)
 
 def send_weekly_attendance_email():
-    report_body = generate_weekly_attendance_report
+    report_body = generate_weekly_attendance_report()
 
     email = EmailMessage(
         subject=f"Weekly Attendance Report - {timezone.localdate().strftime('%Y-%m-%d')}",
