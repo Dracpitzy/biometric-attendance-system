@@ -1,5 +1,5 @@
 from rest_framework import  serializers
-from .model import AttendanceLog
+from .models import AttendanceLog
 
 class AttendanceLogSerializer(serializers.ModelSerializer):
     staff_name = serializers.CharField(source="staff.first_name", read_only=True)
