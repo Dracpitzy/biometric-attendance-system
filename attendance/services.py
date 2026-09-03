@@ -36,4 +36,4 @@ def send_weekly_attendance_email():
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[settings.ADMIN_EMAIL],
     ) 
-    email.send(fail_silently=False)
+    email.send()
