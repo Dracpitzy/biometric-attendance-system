@@ -35,7 +35,7 @@ class Staff(models.Model):
     fingerprint_template = models.BinaryField(null=True, blank=True)
     device_user_id = models.PositiveIntegerField(null=True, blank=True, unique=True)
 
-    status = models.CharField(max_length=1, choices=Status.choices, default=Status.ACTIVE)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.ACTIVE)
     date_joined = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 

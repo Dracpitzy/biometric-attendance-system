@@ -1,0 +1,7 @@
+Migrations for 'staffs':
+  staffs\migrations\0001_initial.py
+    + Create model Department
+    + Create model Staff
+Migrations for 'attendance':
+  attendance\migrations\0001_initial.py
+    + Create model AttendanceLog

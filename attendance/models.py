@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from staffs.models import staff
+from staffs.models import Staff
 
 class AttendanceLog(models.Model):
     class LogType(models.TextChoices):
