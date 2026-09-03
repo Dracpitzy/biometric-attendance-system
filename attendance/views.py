@@ -12,7 +12,7 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AttendanceLog.objects.all()
     serializer_class = AttendanceLogSerializer
 
-    @action(detail=False, methods=["Post"], url_path="scan")
+    @action(detail=False, methods=["post"], url_path="scan")
     def scan(self, request):
         device_user_id = request.data.get("device_user_id")
 
@@ -52,5 +52,24 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = AttendanceLogSerializer(log)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=["get"], url_path="currrently-in")
+    def currrently_in(self, request):
+        today = timezone.localdate()
+
+        checked_in_ids = (
+            AttendanceLog.objects.filter(timestamp__date=today, log_type=AttendanceLog.LogType.CHECK_IN).values_list("staff_id", flat=True)
+        )
+        checked_out_ids = (
+            AttendanceLog.objects.filter(timestamp__date=today, log_type=AttendanceLog.LogType.CHECK_OUT).values_list("staff_id", flat=True)
+        )
+        currrently_in_ids = set(checked_in_ids) - set(checked_out_ids)
+
+        staff = Staff.objects.filter(id__in=currrently_in_ids, is_active=True)
+
+        from staffs.serializers import StaffSerializer
+        serializer = StaffSerializer(staff, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
 
 
