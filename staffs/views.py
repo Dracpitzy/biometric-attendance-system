@@ -1,7 +1,9 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.shortcuts import render
 
+from .forms import StaffRegistrationForm
 from .models import Department, Staff
 from .serializers import DepartmentSerializer, StaffSerializer
 
@@ -49,3 +51,15 @@ class StaffViewSet(viewsets.ModelViewSet):
             {"message": "Fingerprint enrollment removed."}, 
             status=status.HTTP_200_OK
         )
+
+
+
+def staff_register(request):
+    if request.method == "POST":
+        form = StaffRegistrationForm(request.POST)
+        if form.is_valid():
+            staff = form.save()
+            return render(request, "staffs/register_success.html", {"staff": staff})
+    else:
+        form = StaffRegistrationForm()
+    return render(request, "staffs/register.html", {"form": form})

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful</title>
+    <style>
+        body {
+            font-family: -apple-system, sans-serif;
+            background: #f4f5f7;
+            display: flex;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+        .card {
+            background: #fff;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        h1 { font-size: 20px; margin-bottom: 10px; }
+        .staff-id {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2563eb;
+            margin: 16px 0;
+        }
+        p { font-size: 14px; color: #444; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>You're registered, {{ staff.first_name }}!</h1>
+        <div class="staff-id">{{ staff.staff_id }}</div>
+        <p>Please remember this ID. You'll enroll your fingerprint at the gate scanner using this number.</p>
+    </div>
+</body>
+</html>
