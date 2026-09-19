@@ -5,10 +5,13 @@ from rest_framework.response import Response
 import calendar
 from datetime import date
 from django.shortcuts import render
+from django.db.models import Count
 
 from staffs.models import Staff
 from .models import AttendanceLog
 from .serializers import AttendanceLogSerializer
+from staffs.models import Department
+from accounts.permissions import IsAnyAdmin
 
 
 class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
@@ -72,6 +75,81 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
         from staffs.serializers import StaffSerializer
         serializer = StaffSerializer(staff, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+    @action(
+        detail=False, methods=["get"], url_path="today-summary",
+        permission_classes=[IsAnyAdmin],
+    )
+    def today_summary(self, request):
+        today = timezone.localdate()
+        admin_profile = request.user.admin_profile
+
+        staff_qs = Staff.objects.filter(is_active=True)
+        if admin_profile.role == "department_head":
+            staff_qs = staff_qs.filter(department=admin_profile.department)
+
+        checked_in_ids = set(
+            AttendanceLog.objects.filter(
+                timestamp__date=today,
+                log_type=AttendanceLog.LogType.CHECK_IN,
+                staff__in=staff_qs,
+            ).values_list("staff_id", flat=True)
+        )
+
+        by_department = []
+        for dept in Department.objects.filter(staffs__in=staff_qs).distinct():
+            dept_staff = staff_qs.filter(department=dept)
+            by_department.append({
+                "department": dept.name,
+                "total_staff": dept_staff.count(),
+                "checked_in": dept_staff.filter(id__in=checked_in_ids).count(),
+            })
+
+        return Response({
+            "date": today,
+            "total_active_staff": staff_qs.count(),
+            "checked_in_today": len(checked_in_ids),
+            "by_department": by_department,
+        })
+
+    @action(
+        detail=False, methods=["get"], url_path="department-stats",
+        permission_classes=[IsAnyAdmin],
+    )
+    def department_stats(self, request):
+        today = timezone.localdate()
+        admin_profile = request.user.admin_profile
+
+        departments = Department.objects.all()
+        if admin_profile.role == "department_head":
+            departments = departments.filter(id=admin_profile.department_id)
+
+        days_elapsed = today.day
+        results = []
+        for dept in departments:
+            staff_qs = Staff.objects.filter(department=dept, is_active=True)
+            staff_count = staff_qs.count()
+            possible_checkins = staff_count * days_elapsed
+
+            actual_checkins = AttendanceLog.objects.filter(
+                staff__in=staff_qs,
+                log_type=AttendanceLog.LogType.CHECK_IN,
+                timestamp__year=today.year,
+                timestamp__month=today.month,
+            ).values("staff_id", "timestamp__date").distinct().count()
+
+            rate = round((actual_checkins / possible_checkins) * 100, 1) if possible_checkins else 0
+
+            results.append({
+                "department": dept.name,
+                "staff_count": staff_count,
+                "checkins_this_month": actual_checkins,
+                "attendance_rate_percent": rate,
+            })
+
+        return Response(results)
 
     
 def attendance_lookup(request):

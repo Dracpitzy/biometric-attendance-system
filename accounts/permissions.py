@@ -8,3 +8,8 @@ class IsSuperAdmin(BasePermission):
             and hasattr(request.user, "admin_profile")
             and request.user.admin_profile.role == "superadmin"
         )
+
+
+class IsAnyAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and hasattr(request.user, "admin_profile")

@@ -6,6 +6,7 @@ from django.shortcuts import render
 from .forms import StaffRegistrationForm
 from .models import Department, Staff
 from .serializers import DepartmentSerializer, StaffSerializer
+from accounts.permissions import IsSuperAdmin, IsAnyAdmin
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -51,6 +52,45 @@ class StaffViewSet(viewsets.ModelViewSet):
             {"message": "Fingerprint enrollment removed."}, 
             status=status.HTTP_200_OK
         )
+
+    @action(
+        detail=True, methods=["patch"], url_path="update-status",
+        permission_classes=[IsSuperAdmin],
+    )
+    def update_status(self, request, pk=None):
+        staff = self.get_object()
+        new_status = request.data.get("status")
+        valid_statuses = [choice[0] for choice in Staff.Status.choices]
+
+        if new_status not in valid_statuses:
+            return Response(
+                {"error": f"Invalid status. Must be one of {valid_statuses}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        staff.status = new_status
+        staff.save()
+        return Response(
+            {"message": f"Status updated to {staff.get_status_display()}."},
+            status=status.HTTP_200_OK,
+        )
+
+    
+    @action(
+        detail=False, methods=["get"], url_path="pending-enrollment",
+        permission_classes=[IsAnyAdmin],
+    )
+    def pending_enrollment(self, request):
+        queryset = Staff.objects.filter(
+            device_user_id__isnull=True, fingerprint_template__isnull=True, is_active=True
+        )
+
+        admin_profile = request.user.admin_profile
+        if admin_profile.role == "department_head":
+            queryset = queryset.filter(department=admin_profile.department)
+
+        serializer = StaffSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
