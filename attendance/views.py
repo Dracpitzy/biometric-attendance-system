@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 import calendar
 from datetime import date
-from django.shortcuts imort render
+from django.shortcuts import render
 
 from staffs.models import Staff
 from .models import AttendanceLog
