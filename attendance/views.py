@@ -180,3 +180,7 @@ def attendance_lookup(request):
         "year_choices": year_choices,
     })
 
+
+def attendance_landing(request):
+    return render(request, "attendance/attendance_landing.html")
+
