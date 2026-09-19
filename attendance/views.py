@@ -77,6 +77,14 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+    def get_queryset(self):
+        queryset = AttendanceLog.objects.all()
+        staff_id = self.request.query_params.get("staff")
+        if staff_id:
+            queryset = queryset.filter(staff_id=staff_id)
+        return queryset
+
+
 
     @action(
         detail=False, methods=["get"], url_path="today-summary",
