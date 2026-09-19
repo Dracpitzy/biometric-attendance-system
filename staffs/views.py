@@ -6,12 +6,18 @@ from django.shortcuts import render
 from .forms import StaffRegistrationForm
 from .models import Department, Staff
 from .serializers import DepartmentSerializer, StaffSerializer
-from accounts.permissions import IsSuperAdmin, IsAnyAdmin
+from accounts.permissions import IsSuperAdmin, IsAnyAdmin, IsSuperAdminOrReadOnly
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+
+
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+    permission_classes = [IsSuperAdminOrReadOnly]
 
 
 class StaffViewSet(viewsets.ModelViewSet):

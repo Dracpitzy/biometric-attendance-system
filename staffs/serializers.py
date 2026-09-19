@@ -2,9 +2,11 @@ from rest_framework import serializers
 from .models import Department, Staff
 
 class DepartmentSerializer(serializers.ModelSerializer):
+    staff_count = serializers.IntegerField(source="staffs.count", read_only=True)
+
     class Meta:
         model = Department
-        fields = ["id", "name"]
+        fields = ["id", "name", "staff_count"]
 
 
 class StaffSerializer(serializers.ModelSerializer):
