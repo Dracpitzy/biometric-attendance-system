@@ -9,10 +9,6 @@ from .serializers import DepartmentSerializer, StaffSerializer
 from accounts.permissions import IsSuperAdmin, IsAnyAdmin, IsSuperAdminOrReadOnly
 
 
-class DepartmentViewSet(viewsets.ModelViewSet):
-    queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
-
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
@@ -98,6 +94,14 @@ class StaffViewSet(viewsets.ModelViewSet):
         serializer = StaffSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def get_queryset(self):
+        queryset = Staff.objects.all()
+        user = self.request.user
+        if user.is_authenticated and hasattr(user, "admin_profile"):
+            if user.admin_profile.role == "department_head":
+                queryset = queryset.filter(department=user.admin_profile.department)
+        return queryset
+
 
 
 def staff_register(request):
@@ -109,12 +113,3 @@ def staff_register(request):
     else:
         form = StaffRegistrationForm()
     return render(request, "staffs/register.html", {"form": form})
-
-
-def get_queryset(self):
-    queryset = Staff.objects.all()
-    user = self.request.user
-    if user.is_authenticated and hasattr(user, "admin_profile"):
-        if user.admin_profile.role == "department_head":
-            queryset = queryset.filter(department=user.admin_profile.department)
-    return queryset
