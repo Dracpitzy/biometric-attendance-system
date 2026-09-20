@@ -85,6 +85,12 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(staff_id=staff_id)
         if department_id:
             queryset = queryset.filter(staff__department_id=department_id)
+
+        user = self.request.user
+        if user.is_authenticated and hasattr(user, "admin_profile"):
+            if user.admin_profile.role == "department_head":
+                queryset = queryset.filter(staff__department=user.admin_profile.department)
+
         return queryset
 
 

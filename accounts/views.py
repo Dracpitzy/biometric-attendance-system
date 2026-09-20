@@ -38,3 +38,22 @@ class AdminProfileListCreateView(generics.ListCreateAPIView):
         if self.request.method == "POST":
             return AdminProfileCreateSerializer
         return AdminProfileSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        admin_profile = serializer.save()
+        output_serializer = AdminProfileSerializer(admin_profile)
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+class AdminProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = AdminProfile.objects.select_related("user", "department", "linked_staff")
+    serializer_class = AdminProfileSerializer
+    permission_classes = [IsSuperAdmin]
+
+    def perform_destroy(self, instance):
+        user = instance.user
+        instance.delete()
+        user.delete()
