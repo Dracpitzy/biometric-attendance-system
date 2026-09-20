@@ -15,6 +15,14 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     serializer_class = DepartmentSerializer
     permission_classes = [IsSuperAdminOrReadOnly]
 
+    def get_queryset(self):
+        queryset = Department.objects.all()
+        user = self.request.user
+        if user.is_authenticated and hasattr(user, "admin_profile"):
+            if user.admin_profile.role == "department_head":
+                queryset = queryset.filter(id=user.admin_profile.department_id)
+        return queryset
+
 
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all()
