@@ -80,8 +80,11 @@ class AttendanceLogViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = AttendanceLog.objects.all()
         staff_id = self.request.query_params.get("staff")
+        department_id = self.request.query_params.get("department")
         if staff_id:
             queryset = queryset.filter(staff_id=staff_id)
+        if department_id:
+            queryset = queryset.filter(staff__department_id=department_id)
         return queryset
 
 
