@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,21 +29,30 @@
             overflow: hidden;
             padding: 28px 24px 60px;
         }
+        .hero-bg-logo {
+            position: absolute;
+            top: -15%;
+            right: -10%;
+            width: 700px;
+            max-width: none;
+            opacity: 0.14;
+            filter: blur(8px);
+            pointer-events: none;
+            z-index: 0;
+        }
         .hero-nav {
+            position: relative;
+            z-index: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
             max-width: 1100px;
             margin: 0 auto 40px;
         }
-        .wordmark {
-            font-size: 22px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: 0.5px;
-        }
-        .wordmark span { color: var(--cyan-light); }
+        .hero-logo { height: 44px; width: auto; }
         .hero-inner {
+            position: relative;
+            z-index: 1;
             max-width: 1100px;
             margin: 0 auto;
             display: flex;
@@ -184,8 +194,9 @@
 <body>
 
     <section class="hero">
+        <img src="{% static 'staffs/img/itv-logo.png' %}" alt="" class="hero-bg-logo">
         <div class="hero-nav">
-            <div class="wordmark">ITV<span>login</span></div>
+            <img src="{% static 'staffs/img/itv-logo.png' %}" alt="ITV" class="hero-logo">
         </div>
         <div class="hero-inner">
             <div class="hero-text">
@@ -248,7 +259,6 @@
     </section>
 
     <script>
-        // ---------- Fingerprint-style particle network ----------
         const canvas = document.getElementById('network');
         const ctx = canvas.getContext('2d');
         let w, h, particles = [];
@@ -259,7 +269,6 @@
         }
         window.addEventListener('resize', resize);
 
-        // Seed particles along concentric warped rings — loosely fingerprint-shaped
         function seedParticles() {
             particles = [];
             const cx = w / 2, cy = h / 2;
@@ -287,13 +296,11 @@
             ctx.clearRect(0, 0, w, h);
             const t = time * 0.001;
 
-            // update positions with gentle drift
             particles.forEach(p => {
                 p.x = p.baseX + Math.sin(t * p.speed + p.phase) * 4;
                 p.y = p.baseY + Math.cos(t * p.speed + p.phase) * 4;
             });
 
-            // connect nearby particles
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const a = particles[i], b = particles[j];
@@ -312,7 +319,6 @@
                 }
             }
 
-            // draw nodes
             particles.forEach(p => {
                 const pulse = 0.6 + Math.sin(t * p.speed * 1.5 + p.phase) * 0.4;
                 ctx.beginPath();
@@ -328,13 +334,11 @@
         seedParticles();
         requestAnimationFrame(draw);
 
-        // Smooth scroll for the hero CTA
         document.querySelector('.cta').addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById('form').scrollIntoView({ behavior: 'smooth' });
         });
 
-        // ---------- Form validation (unchanged behavior) ----------
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
         const phoneRegex = /^\+?\d{9,15}$/;
